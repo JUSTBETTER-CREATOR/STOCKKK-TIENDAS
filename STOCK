@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Stock Scanner</title>
+
+  <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7efff;
+      margin: 0;
+      padding: 18px;
+      color: #2b2b2b;
+    }
+
+    .contenedor {
+      max-width: 540px;
+      margin: auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 22px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.14);
+    }
+
+    h1 {
+      text-align: center;
+      color: #7b2cbf;
+      margin-bottom: 5px;
+    }
+
+    .subtitulo {
+      text-align: center;
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 16px;
+      background: #000;
+      margin-top: 12px;
+      display: none;
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: bold;
+      color: #3c096c;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 13px;
+      margin-top: 6px;
+      border: 1px solid #cfcfcf;
+      border-radius: 12px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-principal {
+      background: #9d4edd;
+      color: white;
+    }
+
+    .btn-secundario {
+      background: #e0c3fc;
+      color: #3c096c;
+    }
+
+    .btn-error {
+      background: #ffccd5;
+      color: #9d0208;
+    }
+
+    .mensaje {
+      margin-top: 12px;
+      text-align: center;
+      font-weight: bold;
+      min-height: 24px;
+    }
+
+    .ok {
+      color: #168aad;
+    }
+
+    .error {
+      color: #d00000;
+    }
+
+    .contador {
+      background: #faf7ff;
+      border: 1px dashed #b185db;
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 16px;
+      text-align: center;
+      font-weight: bold;
+      color: #3c096c;
+    }
+
+    .lista {
+      margin-top: 14px;
+      max-height: 260px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 14px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .item {
+      padding: 9px;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    .nota {
+      font-size: 12px;
+      color: #666;
+      margin-top: 6px;
+    }
+
+    .mini {
+      font-size: 13px;
+      color: #555;
+      text-align: center;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="contenedor">
+    <h1>📦 Stock Scanner</h1>
+    <p class="subtitulo">Escanea códigos de barras y envía el stock a Google Sheets</p>
+
+    <label>Determinante</label>
+    <input
+      id="determinante"
+      inputmode="numeric"
+      maxlength="4"
+      placeholder="Solo 4 números. Ej. 0013"
+      oninput="soloNumeros(this, 4)"
+    />
+    <div class="nota">Se guardará en una hoja con nombre: DETERMINANTE_FECHA.</div>
+
+    <button class="btn-principal" onclick="iniciarScanner()">
+      Abrir cámara y escanear código
+    </button>
+
+    <video id="video"></video>
+
+    <label>Último código detectado</label>
+    <input id="codigoActual" placeholder="Aquí aparecerá el último código" readonly />
+
+    <button class="btn-principal" onclick="iniciarScanner()">
+      Escanear siguiente código
+    </button>
+
+    <label>Agregar código manual</label>
+    <input
+      id="codigoManual"
+      placeholder="Opcional, por si no lee la cámara"
+    />
+
+    <button class="btn-secundario" onclick="agregarCodigoManual()">
+      Agregar código manual
+    </button>
+
+    <button class="btn-error" onclick="marcarErroneo()">
+      No se pudo escanear / Agregar ERRÓNEO
+    </button>
+
+    <button class="btn-secundario" onclick="quitarUltimo()">
+      Quitar último código
+    </button>
+
+    <label>Comentarios generales</label>
+    <textarea id="comentarios" placeholder="Opcional. Ej. Stock contado por tienda"></textarea>
+
+    <div class="contador" id="contador">
+      Códigos registrados: 0
+    </div>
+
+    <div class="lista" id="listaCodigos">
+      Aún no hay códigos registrados.
+    </div>
+
+    <button class="btn-principal" onclick="enviarStock()">
+      Enviar stock a Google Sheets
+    </button>
+
+    <button class="btn-secundario" onclick="limpiarTodo()">
+      Nueva captura de stock
+    </button>
+
+    <p class="mini">Cuando envíes, se guardará en el Google Sheets nuevo conectado al Apps Script.</p>
+
+    <div id="mensaje" class="mensaje"></div>
+  </div>
+
+  <iframe name="iframeOculto" style="display:none;"></iframe>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyutziF63vVCVRmw2CIbYZdoQvULaoRycFvwNU_VLEYcKNWsV9ajiHhPNnB9uAh-8h7/exec";
+
+    const codeReader = new ZXing.BrowserMultiFormatReader();
+
+    let temporizadorScanner = null;
+    let codigos = [];
+
+    function mostrarMensaje(texto, tipo = "") {
+      const mensaje = document.getElementById("mensaje");
+      mensaje.textContent = texto;
+      mensaje.className = "mensaje " + tipo;
+    }
+
+    function soloNumeros(input, max) {
+      input.value = input.value.replace(/\D/g, "").slice(0, max);
+    }
+
+    async function iniciarScanner() {
+      const determinante = document.getElementById("determinante").value.trim();
+
+      if (!/^\d{4}$/.test(determinante)) {
+        mostrarMensaje("Primero captura la determinante con exactamente 4 números.", "error");
+        return;
+      }
+
+      const video = document.getElementById("video");
+      const codigoActual = document.getElementById("codigoActual");
+
+      codigoActual.value = "";
+      video.style.display = "block";
+
+      mostrarMensaje("Abriendo cámara... acepta el permiso.", "");
+
+      try {
+        const dispositivos = await codeReader.listVideoInputDevices();
+
+        if (!dispositivos || dispositivos.length === 0) {
+          mostrarMensaje("No se encontró cámara.", "error");
+          return;
+        }
+
+        const camaraTrasera =
+          dispositivos.find(d =>
+            d.label.toLowerCase().includes("back") ||
+            d.label.toLowerCase().includes("environment") ||
+            d.label.toLowerCase().includes("trasera")
+          ) || dispositivos[0];
+
+        let detectado = false;
+
+        temporizadorScanner = setTimeout(() => {
+          if (!detectado) {
+            detenerScanner();
+            mostrarMensaje("No se pudo escanear. Puedes agregar ERRÓNEO o manual.", "error");
+          }
+        }, 15000);
+
+        await codeReader.decodeFromVideoDevice(
+          camaraTrasera.deviceId,
+          video,
+          (result, error) => {
+            if (result) {
+              detectado = true;
+              clearTimeout(temporizadorScanner);
+
+              const codigo = result.getText();
+              codigoActual.value = codigo;
+
+              agregarCodigo(codigo);
+
+              mostrarMensaje("✅ Código agregado a la lista.", "ok");
+              detenerScanner();
+            }
+          }
+        );
+
+      } catch (error) {
+        console.error(error);
+        mostrarMensaje("No se pudo abrir la cámara. Revisa permisos o abre la liga HTTPS.", "error");
+      }
+    }
+
+    function detenerScanner() {
+      try {
+        codeReader.reset();
+
+        const video = document.getElementById("video");
+        video.style.display = "none";
+
+        if (temporizadorScanner) {
+          clearTimeout(temporizadorScanner);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    function agregarCodigo(codigo) {
+      const limpio = String(codigo || "").trim();
+
+      if (!limpio) {
+        mostrarMensaje("No hay código para agregar.", "error");
+        return;
+      }
+
+      codigos.push(limpio);
+      actualizarLista();
+    }
+
+    function agregarCodigoManual() {
+      const codigoManual = document.getElementById("codigoManual").value.trim();
+
+      if (!codigoManual) {
+        mostrarMensaje("Escribe un código manual primero.", "error");
+        return;
+      }
+
+      agregarCodigo(codigoManual);
+      document.getElementById("codigoActual").value = codigoManual;
+      document.getElementById("codigoManual").value = "";
+      mostrarMensaje("✅ Código manual agregado.", "ok");
+    }
+
+    function marcarErroneo() {
+      detenerScanner();
+
+      const consecutivo = codigos.length + 1;
+      const codigoErroneo = "ERRÓNEO_" + consecutivo;
+
+      document.getElementById("codigoActual").value = codigoErroneo;
+      agregarCodigo(codigoErroneo);
+
+      mostrarMensaje("Código ERRÓNEO agregado a la lista.", "error");
+    }
+
+    function quitarUltimo() {
+      if (codigos.length === 0) {
+        mostrarMensaje("No hay códigos para quitar.", "error");
+        return;
+      }
+
+      codigos.pop();
+      actualizarLista();
+      mostrarMensaje("Último código eliminado.", "ok");
+    }
+
+    function actualizarLista() {
+      const contador = document.getElementById("contador");
+      const lista = document.getElementById("listaCodigos");
+
+      contador.textContent = "Códigos registrados: " + codigos.length;
+
+      if (codigos.length === 0) {
+        lista.textContent = "Aún no hay códigos registrados.";
+        return;
+      }
+
+      lista.innerHTML = "";
+
+      codigos.forEach((codigo, index) => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.textContent = `${index + 1}. ${codigo}`;
+        lista.appendChild(div);
+      });
+    }
+
+    function enviarStock() {
+      if (!SCRIPT_URL || SCRIPT_URL.includes("https://script.google.com/macros/s/AKfycbyutziF63vVCVRmw2CIbYZdoQvULaoRycFvwNU_VLEYcKNWsV9ajiHhPNnB9uAh-8h7/exec")) {
+        mostrarMensaje("Falta pegar la URL de Apps Script en el código.", "error");
+        return;
+      }
+
+      const determinante = document.getElementById("determinante").value.trim();
+      const comentarios = document.getElementById("comentarios").value.trim();
+
+      if (!/^\d{4}$/.test(determinante)) {
+        mostrarMensaje("La determinante debe tener exactamente 4 números.", "error");
+        return;
+      }
+
+      if (codigos.length === 0) {
+        mostrarMensaje("No hay códigos registrados para enviar.", "error");
+        return;
+      }
+
+      const confirmar = confirm(
+        "Vas a enviar " + codigos.length +
+        " códigos de stock para la determinante " + determinante +
+        ". ¿Continuar?"
+      );
+
+      if (!confirmar) return;
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = SCRIPT_URL;
+      form.target = "iframeOculto";
+      form.style.display = "none";
+
+      const campos = {
+        determinante: determinante,
+        codigos_json: JSON.stringify(codigos),
+        comentarios: comentarios
+      };
+
+      Object.keys(campos).forEach(nombre => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = nombre;
+        input.value = campos[nombre];
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+
+      mostrarMensaje("✅ Stock enviado a Google Sheets. Revisa tu archivo STOCK.", "ok");
+    }
+
+    function limpiarTodo() {
+      detenerScanner();
+
+      codigos = [];
+
+      document.getElementById("determinante").value = "";
+      document.getElementById("codigoActual").value = "";
+      document.getElementById("codigoManual").value = "";
+      document.getElementById("comentarios").value = "";
+
+      actualizarLista();
+
+      mostrarMensaje("Lista limpia para nuevo stock.", "ok");
+    }
+  </script>
+</body>
+</html>
