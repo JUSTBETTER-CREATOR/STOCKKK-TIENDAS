@@ -176,7 +176,7 @@
       Abrir cámara y escanear código
     </button>
 
-    <video id="video"></video>
+    <video id="video" playsinline></video>
 
     <label>Último código detectado</label>
     <input id="codigoActual" placeholder="Aquí aparecerá el último código" readonly />
@@ -255,6 +255,8 @@
         return;
       }
 
+      detenerScanner();
+
       const video = document.getElementById("video");
       const codigoActual = document.getElementById("codigoActual");
 
@@ -317,7 +319,9 @@
         codeReader.reset();
 
         const video = document.getElementById("video");
-        video.style.display = "none";
+        if (video) {
+          video.style.display = "none";
+        }
 
         if (temporizadorScanner) {
           clearTimeout(temporizadorScanner);
