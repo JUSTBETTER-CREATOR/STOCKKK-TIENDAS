@@ -9,222 +9,363 @@
   <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
 
   <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #1f4e79;
+      --primary-hover: #173b5c;
+      --secondary: #eef2f7;
+      --border: #d9dee7;
+      --success: #0f8a4b;
+      --success-bg: #e8f7ef;
+      --danger: #b42318;
+      --danger-bg: #fdecec;
+      --shadow: 0 12px 35px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f7efff;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
       margin: 0;
-      padding: 18px;
-      color: #2b2b2b;
+      padding: 20px;
+      color: var(--text);
     }
 
     .contenedor {
-      max-width: 540px;
+      max-width: 620px;
       margin: auto;
-      background: #ffffff;
-      padding: 20px;
+      background: var(--card);
+      padding: 24px;
       border-radius: 22px;
-      box-shadow: 0 10px 28px rgba(0,0,0,0.14);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(217, 222, 231, 0.7);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 22px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
     }
 
     h1 {
-      text-align: center;
-      color: #7b2cbf;
-      margin-bottom: 5px;
+      margin: 0;
+      color: var(--primary);
+      font-size: 28px;
+      letter-spacing: -0.4px;
     }
 
     .subtitulo {
-      text-align: center;
-      color: #555;
+      color: var(--muted);
       font-size: 14px;
-      margin-bottom: 18px;
+      margin: 8px 0 0;
+      line-height: 1.4;
+    }
+
+    .seccion {
+      background: #fbfcfe;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 14px;
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      margin-bottom: 7px;
+      font-weight: 700;
+      color: #24364b;
+      font-size: 14px;
+    }
+
+    select,
+    input,
+    textarea {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 15px;
+      background: #ffffff;
+      color: var(--text);
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    select:focus,
+    input:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(31, 78, 121, 0.12);
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
     }
 
     video {
       width: 100%;
       border-radius: 16px;
       background: #000;
-      margin-top: 12px;
+      margin-top: 14px;
+      display: none;
+      border: 3px solid var(--primary);
+    }
+
+    .nota {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 7px;
+      line-height: 1.4;
+    }
+
+    .info-tienda {
+      margin-top: 10px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      background: #eef6ff;
+      border: 1px solid #cfe4fb;
+      color: #173b5c;
+      font-size: 13px;
+      font-weight: 700;
       display: none;
     }
 
-    label {
-      display: block;
+    .fila-botones {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
       margin-top: 14px;
-      font-weight: bold;
-      color: #3c096c;
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 13px;
-      margin-top: 6px;
-      border: 1px solid #cfcfcf;
-      border-radius: 12px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-
-    textarea {
-      min-height: 70px;
-      resize: vertical;
     }
 
     button {
       width: 100%;
       padding: 14px;
-      margin-top: 12px;
       border: none;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: bold;
+      border-radius: 13px;
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
+      transition: transform 0.12s, background 0.2s, opacity 0.2s;
+    }
+
+    button:active {
+      transform: scale(0.99);
     }
 
     .btn-principal {
-      background: #9d4edd;
+      background: var(--primary);
       color: white;
     }
 
+    .btn-principal:hover {
+      background: var(--primary-hover);
+    }
+
     .btn-secundario {
-      background: #e0c3fc;
-      color: #3c096c;
+      background: var(--secondary);
+      color: #24364b;
+      border: 1px solid var(--border);
     }
 
     .btn-error {
-      background: #ffccd5;
-      color: #9d0208;
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #f5b4ae;
     }
 
     .mensaje {
-      margin-top: 12px;
+      margin-top: 14px;
+      padding: 12px;
       text-align: center;
-      font-weight: bold;
+      font-weight: 800;
       min-height: 24px;
+      border-radius: 13px;
+      display: none;
+      letter-spacing: 0.2px;
     }
 
-    .ok {
-      color: #168aad;
+    .mensaje.ok {
+      display: block;
+      color: var(--success);
+      background: var(--success-bg);
+      border: 1px solid #b8e7ca;
     }
 
-    .error {
-      color: #d00000;
+    .mensaje.error {
+      display: block;
+      color: var(--danger);
+      background: var(--danger-bg);
+      border: 1px solid #f5b4ae;
+    }
+
+    .mensaje.info {
+      display: block;
+      color: var(--primary);
+      background: #eef6ff;
+      border: 1px solid #cfe4fb;
     }
 
     .contador {
-      background: #faf7ff;
-      border: 1px dashed #b185db;
-      border-radius: 14px;
-      padding: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
       margin-top: 16px;
       text-align: center;
-      font-weight: bold;
-      color: #3c096c;
+      font-weight: 800;
+      color: var(--primary);
     }
 
     .lista {
       margin-top: 14px;
       max-height: 260px;
       overflow-y: auto;
-      border: 1px solid #eee;
-      border-radius: 14px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 10px;
-      background: #fff;
+      background: #ffffff;
     }
 
     .item {
-      padding: 9px;
-      border-bottom: 1px solid #eee;
+      padding: 10px;
+      border-bottom: 1px solid #edf0f5;
       font-size: 14px;
       word-break: break-word;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
     }
 
     .item:last-child {
       border-bottom: none;
     }
 
-    .nota {
+    .tag-ok {
+      color: var(--success);
+      font-weight: 800;
       font-size: 12px;
-      color: #666;
-      margin-top: 6px;
+      white-space: nowrap;
+    }
+
+    .tag-error {
+      color: var(--danger);
+      font-weight: 800;
+      font-size: 12px;
+      white-space: nowrap;
     }
 
     .mini {
-      font-size: 13px;
-      color: #555;
+      font-size: 12px;
+      color: var(--muted);
       text-align: center;
-      margin-top: 8px;
+      margin-top: 12px;
+      line-height: 1.4;
+    }
+
+    .oculto {
+      display: none !important;
+    }
+
+    @media (min-width: 560px) {
+      .fila-botones.doble {
+        grid-template-columns: 1fr 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
   <div class="contenedor">
-    <h1>📦 Stock Scanner</h1>
-    <p class="subtitulo">Escanea códigos de barras y envía el stock a Google Sheets</p>
-
-    <label>Determinante</label>
-    <input
-      id="determinante"
-      inputmode="numeric"
-      maxlength="4"
-      placeholder="Solo 4 números. Ej. 0013"
-      oninput="soloNumeros(this, 4)"
-    />
-    <div class="nota">Se guardará en una hoja con nombre: DETERMINANTE_FECHA.</div>
-
-    <button class="btn-principal" onclick="iniciarScanner()">
-      Abrir cámara y escanear código
-    </button>
-
-    <video id="video" playsinline></video>
-
-    <label>Último código detectado</label>
-    <input id="codigoActual" placeholder="Aquí aparecerá el último código" readonly />
-
-    <button class="btn-principal" onclick="iniciarScanner()">
-      Escanear siguiente código
-    </button>
-
-    <label>Agregar código manual</label>
-    <input
-      id="codigoManual"
-      placeholder="Opcional, por si no lee la cámara"
-    />
-
-    <button class="btn-secundario" onclick="agregarCodigoManual()">
-      Agregar código manual
-    </button>
-
-    <button class="btn-error" onclick="marcarErroneo()">
-      No se pudo escanear / Agregar ERRÓNEO
-    </button>
-
-    <button class="btn-secundario" onclick="quitarUltimo()">
-      Quitar último código
-    </button>
-
-    <label>Comentarios generales</label>
-    <textarea id="comentarios" placeholder="Opcional. Ej. Stock contado por tienda"></textarea>
-
-    <div class="contador" id="contador">
-      Códigos registrados: 0
+    <div class="header">
+      <h1>Stock Scanner</h1>
+      <p class="subtitulo">Escanea códigos de barras y envía el stock a Google Sheets.</p>
     </div>
 
-    <div class="lista" id="listaCodigos">
-      Aún no hay códigos registrados.
+    <div class="seccion">
+      <label for="determinante">Determinante / tienda</label>
+      <select id="determinante" onchange="mostrarResumenTienda()">
+        <option value="">Selecciona una determinante...</option>
+      </select>
+
+      <div id="infoTienda" class="info-tienda"></div>
+      <div class="nota">Se guardará en una hoja con nombre: DETERMINANTE_FECHA.</div>
     </div>
 
-    <button class="btn-principal" onclick="enviarStock()">
-      Enviar stock a Google Sheets
-    </button>
+    <div class="seccion">
+      <button class="btn-principal" onclick="iniciarScanner()">
+        Abrir cámara y escanear código
+      </button>
 
-    <button class="btn-secundario" onclick="limpiarTodo()">
-      Nueva captura de stock
-    </button>
+      <video id="video" playsinline></video>
 
-    <p class="mini">Cuando envíes, se guardará en el Google Sheets nuevo conectado al Apps Script.</p>
+      <label for="codigoActual">Último código detectado</label>
+      <input id="codigoActual" placeholder="Aquí aparecerá el último código escaneado" readonly />
 
-    <div id="mensaje" class="mensaje"></div>
+      <div class="fila-botones doble">
+        <button class="btn-principal" onclick="iniciarScanner()">
+          Escanear siguiente
+        </button>
+
+        <button class="btn-secundario" onclick="detenerScannerManual()">
+          Cerrar cámara
+        </button>
+      </div>
+
+      <button id="btnErroneo" class="btn-error oculto" onclick="marcarErroneo()">
+        No se pudo escanear / Agregar ERRÓNEO
+      </button>
+
+      <div id="mensaje" class="mensaje"></div>
+    </div>
+
+    <div class="seccion">
+      <label for="codigoManual">Agregar código manual</label>
+      <input id="codigoManual" placeholder="Opcional, por si la cámara no lee el código" />
+
+      <button class="btn-secundario" onclick="agregarCodigoManual()">
+        Agregar código manual
+      </button>
+
+      <button class="btn-secundario" onclick="quitarUltimo()">
+        Quitar último código
+      </button>
+    </div>
+
+    <div class="seccion">
+      <label for="comentarios">Comentarios generales</label>
+      <textarea id="comentarios" placeholder="Opcional. Ej. Stock contado por tienda"></textarea>
+
+      <div class="contador" id="contador">
+        Códigos registrados: 0
+      </div>
+
+      <div class="lista" id="listaCodigos">
+        Aún no hay códigos registrados.
+      </div>
+    </div>
+
+    <div class="seccion">
+      <button class="btn-principal" onclick="enviarStock()">
+        Enviar stock a Google Sheets
+      </button>
+
+      <button class="btn-secundario" onclick="limpiarTodo()">
+        Nueva captura de stock
+      </button>
+
+      <p class="mini">
+        Cuando envíes, se guardará en el Google Sheets conectado a tu Apps Script.
+      </p>
+    </div>
   </div>
 
   <iframe name="iframeOculto" style="display:none;"></iframe>
@@ -232,30 +373,194 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyutziF63vVCVRmw2CIbYZdoQvULaoRycFvwNU_VLEYcKNWsV9ajiHhPNnB9uAh-8h7/exec";
 
+    const TIENDAS = [
+      { id: "0013", nombre: "CH TUXLA CRYSTAL" },
+      { id: "0020", nombre: "GALERIAS ZACATECAS" },
+      { id: "0036", nombre: "CH TAMPICO MADERO" },
+      { id: "0179", nombre: "CH PLAZA PUERTA ARAGON" },
+      { id: "0890", nombre: "WM GARITA" },
+      { id: "1007", nombre: "WM HAROLD PAPE MONCLOVA" },
+      { id: "1027", nombre: "WM SENDERO" },
+      { id: "1138", nombre: "WM DELICIAS" },
+      { id: "1139", nombre: "WM LA HUASTECA" },
+      { id: "1169", nombre: "WM MULTIPLAZA ARBOLEDAS" },
+      { id: "1170", nombre: "WM PARRAL" },
+      { id: "1205", nombre: "WM ALIJADORES" },
+      { id: "1512", nombre: "WM TERCER ANILLO" },
+      { id: "1622", nombre: "WM GOMEZ MORIN" },
+      { id: "1623", nombre: "WM CD CUAUHTÉMOC" },
+      { id: "1656", nombre: "WM CLUB DE GOLF" },
+      { id: "1664", nombre: "WM CHILPANCINGO" },
+      { id: "1833", nombre: "WM LA PASTORA" },
+      { id: "1902", nombre: "WM AEROPUERTO TAMPICO" },
+      { id: "2041", nombre: "WM TOLTECAS" },
+      { id: "2049", nombre: "WM ZARAGOZA" },
+      { id: "2076", nombre: "WM MIGUEL ALEMAN" },
+      { id: "2089", nombre: "WM MATEHUALA" },
+      { id: "2089", nombre: "WM PLAZA MONUMENTAL" },
+      { id: "2179", nombre: "WM SAN NICOLAS" },
+      { id: "2302", nombre: "WM CHIHUAHUA" },
+      { id: "2304", nombre: "WM MEXICALI" },
+      { id: "2349", nombre: "WM ACAPULCO" },
+      { id: "2375", nombre: "WM TORREON" },
+      { id: "2377", nombre: "WM CD. JUAREZ" },
+      { id: "2378", nombre: "WM TAMPICO" },
+      { id: "2446", nombre: "WM SC AVENDA" },
+      { id: "2540", nombre: "WM VICTORIA CENTRO" },
+      { id: "2676", nombre: "WM LA FE" },
+      { id: "2731", nombre: "WM EL MOLINITO" },
+      { id: "3033", nombre: "WM FUENTES MARES" },
+      { id: "3051", nombre: "WM PLAZA CENTRIKA" },
+      { id: "3091", nombre: "WM AVE.REFORMA" },
+      { id: "3127", nombre: "WM LIBRAMIENTO NORTE" },
+      { id: "3211", nombre: "WM INDEPENDENCIA TORREON" },
+      { id: "3358", nombre: "WM CORDILLERAS" },
+      { id: "3588", nombre: "WM PARAISO CUERNAVACA" },
+      { id: "3608", nombre: "WM PLAY MIRAMAR" },
+      { id: "3630", nombre: "WM LAS ADELITAS" },
+      { id: "3719", nombre: "WM MATAMOROS" },
+      { id: "4025", nombre: "WM CD MADERO" },
+      { id: "4026", nombre: "WM GALERIAS DEL VALLE" },
+      { id: "4090", nombre: "WM LOS ATRIOS" },
+      { id: "4138", nombre: "WM SC VILLA JUAREZ" },
+      { id: "4545", nombre: "WM RIO VERDE" },
+      { id: "4546", nombre: "WM ZACATECAS" },
+      { id: "4772", nombre: "SM UNIVERSIDAD MTY" },
+      { id: "4728", nombre: "SM MEXICALI" },
+      { id: "4801", nombre: "SM CD. VICTORIA" },
+      { id: "4809", nombre: "WM APODACA NORTE" },
+      { id: "4819", nombre: "WM FUENTES PIEDRAS NEGRAS" },
+      { id: "4822", nombre: "WM CARDENAS TULANCINGO" },
+      { id: "4901", nombre: "SM TEPEYAC" },
+      { id: "4914", nombre: "SM TAPACHULA" },
+      { id: "4936", nombre: "SM URUAPAN" },
+      { id: "4937", nombre: "SM CHILPANCINGO" },
+      { id: "4941", nombre: "SM REYNOSA" },
+      { id: "4946", nombre: "SM TULANCINGO" },
+      { id: "4950", nombre: "SM MATAMOROS" },
+      { id: "4960", nombre: "SM TECAMAC" },
+      { id: "4968", nombre: "SM HIPERPLAZA TEXCOCO" },
+      { id: "4973", nombre: "SM CIVAC" },
+      { id: "4982", nombre: "SM MACRO PLAZA" },
+      { id: "4983", nombre: "SM PUERTO PEÑASCO" },
+      { id: "4986", nombre: "SM PERIFERICO CUAUTITLAN" },
+      { id: "5055", nombre: "WM CONCORDIA" },
+      { id: "5089", nombre: "WM SAN MARTIN TEXMELUCAN" },
+      { id: "5171", nombre: "WM CD VALLES CENTRO" },
+      { id: "5239", nombre: "WM IGUALA INDEPENDENCIA" },
+      { id: "5296", nombre: "WM SAN REMO" },
+      { id: "5331", nombre: "WM PORVENIR JUAREZ" },
+      { id: "5334", nombre: "WM CD. ACUÑA" },
+      { id: "5727", nombre: "WM JIUTEPEC" },
+      { id: "5728", nombre: "WM NORTE 200" },
+      { id: "5764", nombre: "WM TORRES DEL SUR" },
+      { id: "6204", nombre: "SM SAN NICOLAS" },
+      { id: "6206", nombre: "SM SAN LUIS POTOSI" },
+      { id: "6207", nombre: "SM CUAUTITLAN IZCALLI" },
+      { id: "6208", nombre: "SM EL MOLINITO" },
+      { id: "6213", nombre: "SM CD. VALLES" },
+      { id: "6215", nombre: "SM PATRIA" },
+      { id: "6217", nombre: "SM ZAMORA" },
+      { id: "6219", nombre: "SM INDEPENDENCIA" },
+      { id: "6226", nombre: "SM LA PIEDAD" },
+      { id: "6227", nombre: "SM COZUMEL" },
+      { id: "6229", nombre: "SM CUMBRES" },
+      { id: "6232", nombre: "SM ECATEPEC CENTRO" },
+      { id: "6234", nombre: "SAMS CUAUHTÉMOC" },
+      { id: "6242", nombre: "SM CARRETERA 57" },
+      { id: "6243", nombre: "SM LA RAZA" },
+      { id: "6247", nombre: "SM MULTIPLAZA ARAGON" },
+      { id: "6249", nombre: "SM DELICIAS" },
+      { id: "6251", nombre: "SM H. DEL PARRAL" },
+      { id: "6258", nombre: "SM PERIFERICO ITESO" },
+      { id: "6263", nombre: "SM PUEBLA VIA CAPU" },
+      { id: "6287", nombre: "SM RIOS DE LOS REMEDIOS" },
+      { id: "6295", nombre: "SM PORTAL CENTRO" },
+      { id: "6297", nombre: "SM MORELIA REFORMA" },
+      { id: "6392", nombre: "SM GONZALITOS" },
+      { id: "6482", nombre: "WM GLORIETA SAN LUIS" },
+      { id: "6510", nombre: "WM PUERTO PEÑASCO" },
+      { id: "6515", nombre: "WM TORREÓN NORTE" },
+      { id: "6520", nombre: "WM ZARAGOZA PANITLAN" },
+      { id: "6534", nombre: "SM PACHUCA" },
+      { id: "6563", nombre: "SM TUXTLA GUTIERREZ" },
+      { id: "6577", nombre: "SM TAMPICO" },
+      { id: "6584", nombre: "SM CD. JUAREZ" },
+      { id: "6834", nombre: "WM SAHUAYO" },
+      { id: "6835", nombre: "LOMAS DE ANAHUAC" },
+      { id: "8118", nombre: "SM AGUASCALIENTES" },
+      { id: "8127", nombre: "SM ACAPULCO FARALLON" },
+      { id: "8240", nombre: "SAMS CHIHUAHUA" }
+    ];
+
     const codeReader = new ZXing.BrowserMultiFormatReader();
 
     let temporizadorScanner = null;
     let codigos = [];
 
-    function mostrarMensaje(texto, tipo = "") {
+    document.addEventListener("DOMContentLoaded", () => {
+      cargarTiendas();
+      actualizarLista();
+      mostrarBotonErroneo(false);
+    });
+
+    function cargarTiendas() {
+      const select = document.getElementById("determinante");
+
+      TIENDAS.forEach(tienda => {
+        const option = document.createElement("option");
+        option.value = tienda.id;
+        option.dataset.tienda = tienda.nombre;
+        option.textContent = `(${tienda.id}) ${tienda.nombre}`;
+        select.appendChild(option);
+      });
+    }
+
+    function obtenerTiendaSeleccionada() {
+      const select = document.getElementById("determinante");
+      const option = select.options[select.selectedIndex];
+
+      return {
+        determinante: select.value || "",
+        tienda: option && option.dataset.tienda ? option.dataset.tienda : ""
+      };
+    }
+
+    function mostrarResumenTienda() {
+      const info = document.getElementById("infoTienda");
+      const seleccion = obtenerTiendaSeleccionada();
+
+      if (!seleccion.determinante) {
+        info.style.display = "none";
+        info.textContent = "";
+        return;
+      }
+
+      info.style.display = "block";
+      info.textContent = `Seleccionado: ${seleccion.determinante} | ${seleccion.tienda}`;
+    }
+
+    function mostrarMensaje(texto, tipo = "info") {
       const mensaje = document.getElementById("mensaje");
       mensaje.textContent = texto;
       mensaje.className = "mensaje " + tipo;
     }
 
-    function soloNumeros(input, max) {
-      input.value = input.value.replace(/\D/g, "").slice(0, max);
+    function mostrarBotonErroneo(mostrar) {
+      const btn = document.getElementById("btnErroneo");
+      btn.classList.toggle("oculto", !mostrar);
     }
 
     async function iniciarScanner() {
-      const determinante = document.getElementById("determinante").value.trim();
+      const seleccion = obtenerTiendaSeleccionada();
 
-      if (!/^\d{4}$/.test(determinante)) {
-        mostrarMensaje("Primero captura la determinante con exactamente 4 números.", "error");
+      if (!seleccion.determinante) {
+        mostrarMensaje("Primero selecciona una determinante / tienda.", "error");
         return;
       }
 
       detenerScanner();
+      mostrarBotonErroneo(false);
 
       const video = document.getElementById("video");
       const codigoActual = document.getElementById("codigoActual");
@@ -263,13 +568,15 @@
       codigoActual.value = "";
       video.style.display = "block";
 
-      mostrarMensaje("Abriendo cámara... acepta el permiso.", "");
+      mostrarMensaje("Abriendo cámara... acepta el permiso.", "info");
 
       try {
         const dispositivos = await codeReader.listVideoInputDevices();
 
         if (!dispositivos || dispositivos.length === 0) {
-          mostrarMensaje("No se encontró cámara.", "error");
+          video.style.display = "none";
+          mostrarBotonErroneo(true);
+          mostrarMensaje("No se encontró cámara. Puedes agregar ERRÓNEO o capturar manual.", "error");
           return;
         }
 
@@ -285,7 +592,8 @@
         temporizadorScanner = setTimeout(() => {
           if (!detectado) {
             detenerScanner();
-            mostrarMensaje("No se pudo escanear. Puedes agregar ERRÓNEO o manual.", "error");
+            mostrarBotonErroneo(true);
+            mostrarMensaje("No se pudo escanear. Ahora puedes agregar ERRÓNEO o capturar manual.", "error");
           }
         }, 15000);
 
@@ -293,16 +601,17 @@
           camaraTrasera.deviceId,
           video,
           (result, error) => {
-            if (result) {
+            if (result && !detectado) {
               detectado = true;
               clearTimeout(temporizadorScanner);
 
               const codigo = result.getText();
               codigoActual.value = codigo;
 
-              agregarCodigo(codigo);
+              agregarCodigo(codigo, "ESCANEADO");
 
-              mostrarMensaje("✅ Código agregado a la lista.", "ok");
+              mostrarBotonErroneo(false);
+              mostrarMensaje("✅ CÓDIGO ESCANEADO", "ok");
               detenerScanner();
             }
           }
@@ -310,6 +619,8 @@
 
       } catch (error) {
         console.error(error);
+        detenerScanner();
+        mostrarBotonErroneo(true);
         mostrarMensaje("No se pudo abrir la cámara. Revisa permisos o abre la liga HTTPS.", "error");
       }
     }
@@ -325,13 +636,19 @@
 
         if (temporizadorScanner) {
           clearTimeout(temporizadorScanner);
+          temporizadorScanner = null;
         }
       } catch (error) {
         console.error(error);
       }
     }
 
-    function agregarCodigo(codigo) {
+    function detenerScannerManual() {
+      detenerScanner();
+      mostrarMensaje("Cámara cerrada.", "info");
+    }
+
+    function agregarCodigo(codigo, tipo = "MANUAL") {
       const limpio = String(codigo || "").trim();
 
       if (!limpio) {
@@ -339,7 +656,11 @@
         return;
       }
 
-      codigos.push(limpio);
+      codigos.push({
+        codigo: limpio,
+        tipo: tipo
+      });
+
       actualizarLista();
     }
 
@@ -351,10 +672,13 @@
         return;
       }
 
-      agregarCodigo(codigoManual);
+      agregarCodigo(codigoManual, "MANUAL");
+
       document.getElementById("codigoActual").value = codigoManual;
       document.getElementById("codigoManual").value = "";
-      mostrarMensaje("✅ Código manual agregado.", "ok");
+
+      mostrarBotonErroneo(false);
+      mostrarMensaje("Código manual agregado.", "ok");
     }
 
     function marcarErroneo() {
@@ -364,9 +688,11 @@
       const codigoErroneo = "ERRÓNEO_" + consecutivo;
 
       document.getElementById("codigoActual").value = codigoErroneo;
-      agregarCodigo(codigoErroneo);
+
+      agregarCodigo(codigoErroneo, "ERRÓNEO");
 
       mostrarMensaje("Código ERRÓNEO agregado a la lista.", "error");
+      mostrarBotonErroneo(false);
     }
 
     function quitarUltimo() {
@@ -393,25 +719,35 @@
 
       lista.innerHTML = "";
 
-      codigos.forEach((codigo, index) => {
+      codigos.forEach((registro, index) => {
         const div = document.createElement("div");
         div.className = "item";
-        div.textContent = `${index + 1}. ${codigo}`;
+
+        const spanCodigo = document.createElement("span");
+        spanCodigo.textContent = `${index + 1}. ${registro.codigo}`;
+
+        const spanTipo = document.createElement("span");
+        spanTipo.className = registro.tipo === "ERRÓNEO" ? "tag-error" : "tag-ok";
+        spanTipo.textContent = registro.tipo;
+
+        div.appendChild(spanCodigo);
+        div.appendChild(spanTipo);
+
         lista.appendChild(div);
       });
     }
 
     function enviarStock() {
-      if (!SCRIPT_URL || SCRIPT_URL.includes("https://script.google.com/macros/s/AKfycbyutziF63vVCVRmw2CIbYZdoQvULaoRycFvwNU_VLEYcKNWsV9ajiHhPNnB9uAh-8h7/exec")) {
+      if (!SCRIPT_URL || SCRIPT_URL.includes("PEGA_AQUI")) {
         mostrarMensaje("Falta pegar la URL de Apps Script en el código.", "error");
         return;
       }
 
-      const determinante = document.getElementById("determinante").value.trim();
+      const seleccion = obtenerTiendaSeleccionada();
       const comentarios = document.getElementById("comentarios").value.trim();
 
-      if (!/^\d{4}$/.test(determinante)) {
-        mostrarMensaje("La determinante debe tener exactamente 4 números.", "error");
+      if (!seleccion.determinante) {
+        mostrarMensaje("Selecciona una determinante / tienda.", "error");
         return;
       }
 
@@ -422,11 +758,14 @@
 
       const confirmar = confirm(
         "Vas a enviar " + codigos.length +
-        " códigos de stock para la determinante " + determinante +
-        ". ¿Continuar?"
+        " códigos de stock para:\n\n" +
+        "(" + seleccion.determinante + ") " + seleccion.tienda +
+        "\n\n¿Continuar?"
       );
 
       if (!confirmar) return;
+
+      const codigosPlano = codigos.map(item => item.codigo);
 
       const form = document.createElement("form");
       form.method = "POST";
@@ -435,8 +774,10 @@
       form.style.display = "none";
 
       const campos = {
-        determinante: determinante,
-        codigos_json: JSON.stringify(codigos),
+        determinante: seleccion.determinante,
+        tienda: seleccion.tienda,
+        codigos_json: JSON.stringify(codigosPlano),
+        codigos_detalle_json: JSON.stringify(codigos),
         comentarios: comentarios
       };
 
@@ -452,7 +793,7 @@
       form.submit();
       document.body.removeChild(form);
 
-      mostrarMensaje("✅ Stock enviado a Google Sheets. Revisa tu archivo STOCK.", "ok");
+      mostrarMensaje("✅ Stock enviado a Google Sheets.", "ok");
     }
 
     function limpiarTodo() {
@@ -465,9 +806,13 @@
       document.getElementById("codigoManual").value = "";
       document.getElementById("comentarios").value = "";
 
+      document.getElementById("infoTienda").style.display = "none";
+      document.getElementById("infoTienda").textContent = "";
+
+      mostrarBotonErroneo(false);
       actualizarLista();
 
-      mostrarMensaje("Lista limpia para nuevo stock.", "ok");
+      mostrarMensaje("Lista limpia para nueva captura de stock.", "ok");
     }
   </script>
 </body>
