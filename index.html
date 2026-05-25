@@ -85,7 +85,6 @@
       font-size: 14px;
     }
 
-    select,
     input,
     textarea {
       width: 100%;
@@ -99,7 +98,6 @@
       transition: border 0.2s, box-shadow 0.2s;
     }
 
-    select:focus,
     input:focus,
     textarea:focus {
       border-color: var(--primary);
@@ -131,12 +129,30 @@
       margin-top: 10px;
       padding: 11px 12px;
       border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      display: none;
+    }
+
+    .info-tienda.encontrada {
+      display: block;
+      background: #e8f7ef;
+      border: 1px solid #b8e7ca;
+      color: #0f8a4b;
+    }
+
+    .info-tienda.no-encontrada {
+      display: block;
+      background: #fdecec;
+      border: 1px solid #f5b4ae;
+      color: #b42318;
+    }
+
+    .info-tienda.espera {
+      display: block;
       background: #eef6ff;
       border: 1px solid #cfe4fb;
       color: #173b5c;
-      font-size: 13px;
-      font-weight: 700;
-      display: none;
     }
 
     .fila-botones {
@@ -291,13 +307,19 @@
     </div>
 
     <div class="seccion">
-      <label for="determinante">Determinante / tienda</label>
-      <select id="determinante" onchange="mostrarResumenTienda()">
-        <option value="">Selecciona una determinante...</option>
-      </select>
+      <label for="determinante">Determinante</label>
+      <input
+        id="determinante"
+        inputmode="numeric"
+        maxlength="4"
+        placeholder="Escribe la determinante. Ej. 0013"
+        oninput="validarDeterminanteManual()"
+      />
 
       <div id="infoTienda" class="info-tienda"></div>
-      <div class="nota">Se guardará en una hoja con nombre: DETERMINANTE_FECHA.</div>
+      <div class="nota">
+        Escribe los 4 números de la determinante. Abajo aparecerá automáticamente el nombre de la tienda.
+      </div>
     </div>
 
     <div class="seccion">
@@ -499,45 +521,63 @@
     let codigos = [];
 
     document.addEventListener("DOMContentLoaded", () => {
-      cargarTiendas();
       actualizarLista();
       mostrarBotonErroneo(false);
     });
 
-    function cargarTiendas() {
-      const select = document.getElementById("determinante");
-
-      TIENDAS.forEach(tienda => {
-        const option = document.createElement("option");
-        option.value = tienda.id;
-        option.dataset.tienda = tienda.nombre;
-        option.textContent = `(${tienda.id}) ${tienda.nombre}`;
-        select.appendChild(option);
-      });
+    function limpiarDeterminante(valor) {
+      return String(valor || "").replace(/\D/g, "").slice(0, 4);
     }
 
-    function obtenerTiendaSeleccionada() {
-      const select = document.getElementById("determinante");
-      const option = select.options[select.selectedIndex];
-
-      return {
-        determinante: select.value || "",
-        tienda: option && option.dataset.tienda ? option.dataset.tienda : ""
-      };
+    function buscarTiendasPorDeterminante(determinante) {
+      return TIENDAS.filter(tienda => tienda.id === determinante);
     }
 
-    function mostrarResumenTienda() {
+    function validarDeterminanteManual() {
+      const input = document.getElementById("determinante");
       const info = document.getElementById("infoTienda");
-      const seleccion = obtenerTiendaSeleccionada();
 
-      if (!seleccion.determinante) {
+      input.value = limpiarDeterminante(input.value);
+
+      const determinante = input.value.trim();
+
+      info.className = "info-tienda";
+
+      if (!determinante) {
         info.style.display = "none";
         info.textContent = "";
         return;
       }
 
-      info.style.display = "block";
-      info.textContent = `Seleccionado: ${seleccion.determinante} | ${seleccion.tienda}`;
+      if (determinante.length < 4) {
+        info.classList.add("espera");
+        info.textContent = "Captura los 4 números de la determinante.";
+        return;
+      }
+
+      const tiendasEncontradas = buscarTiendasPorDeterminante(determinante);
+
+      if (tiendasEncontradas.length === 0) {
+        info.classList.add("no-encontrada");
+        info.textContent = "TIENDA NO ENCONTRADA";
+        return;
+      }
+
+      const nombresTiendas = tiendasEncontradas.map(tienda => tienda.nombre).join(" / ");
+
+      info.classList.add("encontrada");
+      info.textContent = `Tienda encontrada: ${nombresTiendas}`;
+    }
+
+    function obtenerTiendaSeleccionada() {
+      const determinante = document.getElementById("determinante").value.trim();
+      const tiendasEncontradas = buscarTiendasPorDeterminante(determinante);
+
+      return {
+        determinante: determinante,
+        tienda: tiendasEncontradas.map(tienda => tienda.nombre).join(" / "),
+        existe: tiendasEncontradas.length > 0
+      };
     }
 
     function mostrarMensaje(texto, tipo = "info") {
@@ -554,8 +594,13 @@
     async function iniciarScanner() {
       const seleccion = obtenerTiendaSeleccionada();
 
-      if (!seleccion.determinante) {
-        mostrarMensaje("Primero selecciona una determinante / tienda.", "error");
+      if (!/^\d{4}$/.test(seleccion.determinante)) {
+        mostrarMensaje("Primero captura la determinante con exactamente 4 números.", "error");
+        return;
+      }
+
+      if (!seleccion.existe) {
+        mostrarMensaje("TIENDA NO ENCONTRADA. Revisa la determinante antes de escanear.", "error");
         return;
       }
 
@@ -746,8 +791,13 @@
       const seleccion = obtenerTiendaSeleccionada();
       const comentarios = document.getElementById("comentarios").value.trim();
 
-      if (!seleccion.determinante) {
-        mostrarMensaje("Selecciona una determinante / tienda.", "error");
+      if (!/^\d{4}$/.test(seleccion.determinante)) {
+        mostrarMensaje("La determinante debe tener exactamente 4 números.", "error");
+        return;
+      }
+
+      if (!seleccion.existe) {
+        mostrarMensaje("TIENDA NO ENCONTRADA. No se puede enviar el stock.", "error");
         return;
       }
 
@@ -806,8 +856,10 @@
       document.getElementById("codigoManual").value = "";
       document.getElementById("comentarios").value = "";
 
-      document.getElementById("infoTienda").style.display = "none";
-      document.getElementById("infoTienda").textContent = "";
+      const info = document.getElementById("infoTienda");
+      info.style.display = "none";
+      info.textContent = "";
+      info.className = "info-tienda";
 
       mostrarBotonErroneo(false);
       actualizarLista();
