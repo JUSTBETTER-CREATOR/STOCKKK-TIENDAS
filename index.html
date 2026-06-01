@@ -317,6 +317,7 @@
       />
 
       <div id="infoTienda" class="info-tienda"></div>
+
       <div class="nota">
         Escribe los 4 números de la determinante. Abajo aparecerá automáticamente el nombre de la tienda.
       </div>
@@ -541,13 +542,18 @@
 
       const determinante = input.value.trim();
 
+      // Reinicia el estado visual cada vez que se escribe o se borra.
+      // Esto evita que el aviso se quede oculto cuando borras y vuelves a poner la determinante.
       info.className = "info-tienda";
+      info.textContent = "";
 
       if (!determinante) {
         info.style.display = "none";
-        info.textContent = "";
         return;
       }
+
+      // Corrección importante: si antes estaba en display:none, aquí lo volvemos a mostrar.
+      info.style.display = "";
 
       if (determinante.length < 4) {
         info.classList.add("espera");
