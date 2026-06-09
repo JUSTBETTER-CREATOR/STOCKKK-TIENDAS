@@ -296,36 +296,204 @@
         grid-template-columns: 1fr 1fr;
       }
     }
+
+
+    /* Diseño por bloques más sencillo */
+    .stock-layout {
+      background: transparent;
+      padding: 0;
+      box-shadow: none;
+      border: none;
+    }
+
+    .hero-stock {
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: #ffffff;
+      border-radius: 24px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: #ffffff;
+      color: var(--primary);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 7px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .mini-guia {
+      margin-top: 14px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .paso {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .paso:last-child {
+      margin-bottom: 0;
+    }
+
+    .paso-num {
+      flex: 0 0 auto;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .seccion {
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07);
+    }
+
+    .seccion-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .seccion-num {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: var(--primary);
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    .titulo-seccion {
+      margin: 0;
+      font-size: 15px;
+      color: var(--primary);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.35px;
+    }
+
+    .descripcion-seccion {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .bloque-resumen {
+      background: #ffffff;
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      padding: 13px;
+      margin-top: 12px;
+    }
+
+    .accion-final {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      margin-top: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .nota-destacada {
+      background: #eef6ff;
+      border: 1px solid #cfe4fb;
+      color: var(--primary);
+      border-radius: 16px;
+      padding: 13px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .footer-gracias {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 16px 0 4px;
+    }
+
   </style>
 </head>
 
+
 <body>
-  <div class="contenedor">
-    <div class="header">
-      <h1>Stock Scanner</h1>
-      <p class="subtitulo">Escanea códigos de barras y envía el stock a Google Sheets.</p>
+  <div class="contenedor stock-layout">
+
+    <header class="hero-stock">
+      <div class="hero-badge">Control de stock</div>
+      <h1>STOCK SCANNER</h1>
+      <p class="subtitulo">Escanea códigos de barras y envía el stock a Google Sheets de forma ordenada.</p>
+    </header>
+
+    <div class="mini-guia">
+      <div class="paso"><span class="paso-num">1</span><div><strong>Escribe la determinante.</strong> Confirma que aparezca el nombre de la tienda.</div></div>
+      <div class="paso"><span class="paso-num">2</span><div><strong>Escanea los códigos.</strong> Cada código se agrega a la lista automáticamente.</div></div>
+      <div class="paso"><span class="paso-num">3</span><div><strong>Revisa y envía.</strong> Valida el total antes de mandar el stock a Google Sheets.</div></div>
     </div>
 
-    <div class="seccion">
+    <section class="seccion">
+      <div class="seccion-header">
+        <div class="seccion-num">1</div>
+        <div>
+          <h2 class="titulo-seccion">SELECCIONA LA TIENDA</h2>
+          <p class="descripcion-seccion">Captura la determinante para identificar dónde se guardará el stock.</p>
+        </div>
+      </div>
+
       <label for="determinante">Determinante</label>
       <input
         id="determinante"
         inputmode="numeric"
         maxlength="4"
-        placeholder="Escribe la determinante. Ej. 0013"
+        placeholder="Ej. 0013"
         oninput="validarDeterminanteManual()"
       />
 
       <div id="infoTienda" class="info-tienda"></div>
 
       <div class="nota">
-        Escribe los 4 números de la determinante. Abajo aparecerá automáticamente el nombre de la tienda.
+        Escribe los 4 números de la determinante. Si la tienda existe, aparecerá automáticamente el nombre.
       </div>
-    </div>
+    </section>
 
-    <div class="seccion">
+    <section class="seccion">
+      <div class="seccion-header">
+        <div class="seccion-num">2</div>
+        <div>
+          <h2 class="titulo-seccion">ESCANEA LOS CÓDIGOS</h2>
+          <p class="descripcion-seccion">Abre la cámara y escanea los códigos de barras uno por uno.</p>
+        </div>
+      </div>
+
       <button class="btn-principal" onclick="iniciarScanner()">
-        Abrir cámara y escanear código
+        ABRIR CÁMARA Y ESCANEAR
       </button>
 
       <video id="video" playsinline></video>
@@ -335,35 +503,53 @@
 
       <div class="fila-botones doble">
         <button class="btn-principal" onclick="iniciarScanner()">
-          Escanear siguiente
+          ESCANEAR SIGUIENTE
         </button>
 
         <button class="btn-secundario" onclick="detenerScannerManual()">
-          Cerrar cámara
+          CERRAR CÁMARA
         </button>
       </div>
 
       <button id="btnErroneo" class="btn-error oculto" onclick="marcarErroneo()">
-        No se pudo escanear / Agregar ERRÓNEO
+        NO SE PUDO ESCANEAR / AGREGAR ERRÓNEO
       </button>
 
       <div id="mensaje" class="mensaje"></div>
-    </div>
+    </section>
 
-    <div class="seccion">
+    <section class="seccion">
+      <div class="seccion-header">
+        <div class="seccion-num">3</div>
+        <div>
+          <h2 class="titulo-seccion">AGREGA O CORRIGE</h2>
+          <p class="descripcion-seccion">Usa esta parte si la cámara no leyó el código o si necesitas quitar el último.</p>
+        </div>
+      </div>
+
       <label for="codigoManual">Agregar código manual</label>
-      <input id="codigoManual" placeholder="Opcional, por si la cámara no lee el código" />
+      <input id="codigoManual" placeholder="Escribe el código si la cámara no lo lee" />
 
-      <button class="btn-secundario" onclick="agregarCodigoManual()">
-        Agregar código manual
-      </button>
+      <div class="fila-botones doble">
+        <button class="btn-secundario" onclick="agregarCodigoManual()">
+          AGREGAR CÓDIGO MANUAL
+        </button>
 
-      <button class="btn-secundario" onclick="quitarUltimo()">
-        Quitar último código
-      </button>
-    </div>
+        <button class="btn-secundario" onclick="quitarUltimo()">
+          QUITAR ÚLTIMO CÓDIGO
+        </button>
+      </div>
+    </section>
 
-    <div class="seccion">
+    <section class="seccion">
+      <div class="seccion-header">
+        <div class="seccion-num">4</div>
+        <div>
+          <h2 class="titulo-seccion">REVISA EL CONTEO</h2>
+          <p class="descripcion-seccion">Antes de enviar, revisa cuántos códigos llevas y agrega comentarios si aplica.</p>
+        </div>
+      </div>
+
       <label for="comentarios">Comentarios generales</label>
       <textarea id="comentarios" placeholder="Opcional. Ej. Stock contado por tienda"></textarea>
 
@@ -374,21 +560,35 @@
       <div class="lista" id="listaCodigos">
         Aún no hay códigos registrados.
       </div>
-    </div>
+    </section>
 
-    <div class="seccion">
+    <section class="accion-final">
+      <div class="seccion-header">
+        <div class="seccion-num">5</div>
+        <div>
+          <h2 class="titulo-seccion">ENVÍA EL STOCK</h2>
+          <p class="descripcion-seccion">Cuando todo esté correcto, manda la información al archivo conectado.</p>
+        </div>
+      </div>
+
+      <div class="nota-destacada">
+        Antes de enviar, confirma que la determinante, la tienda y el total de códigos sean correctos.
+      </div>
+
       <button class="btn-principal" onclick="enviarStock()">
-        Enviar stock a Google Sheets
+        ENVIAR STOCK A GOOGLE SHEETS
       </button>
 
       <button class="btn-secundario" onclick="limpiarTodo()">
-        Nueva captura de stock
+        NUEVA CAPTURA DE STOCK
       </button>
 
       <p class="mini">
         Cuando envíes, se guardará en el Google Sheets conectado a tu Apps Script.
       </p>
-    </div>
+    </section>
+
+    <p class="footer-gracias">Captura de stock lista para tienda.</p>
   </div>
 
   <iframe name="iframeOculto" style="display:none;"></iframe>
